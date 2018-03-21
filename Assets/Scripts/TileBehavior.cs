@@ -14,6 +14,7 @@ public class TileBehavior : MonoBehaviour {
 		ForceMove,
 		Lose,
 		RollAgain,
+		BuySorcererCard,
 		Empty
 	}
 	public TileType tile;

@@ -22,6 +22,11 @@ namespace ParkHopper.Events
 				typeof (PayToRideEvent),
 				typeof (PayToRideSkipEvent),
 
+				// SorcererCard Events
+				typeof (AskBuySorcererCardEvent),
+				typeof (BuySorcererCardEvent),
+				typeof (SkipBuySorcererCardEvent),
+
 
 				// Dummy event, so you don't have to remember about adding an extra
 				// comma before your new event.
@@ -45,11 +50,13 @@ namespace ParkHopper.Events
 		public int cash;
 		public int fastPasses;
 		public int playerNumber;
-		public PlayerBalanceUpdateEvent (int cash, int fastPasses, int playerNumber)
+		public int sorcererCards;
+		public PlayerBalanceUpdateEvent (int cash, int fastPasses, int playerNumber, int sorcererCards)
 		{
 			this.cash = cash;
 			this.fastPasses = fastPasses;
 			this.playerNumber = playerNumber;
+			this.sorcererCards = sorcererCards;
 		}
 	}
 	public class DiceRollBeginEvent : IEvent{}
@@ -102,6 +109,25 @@ namespace ParkHopper.Events
 			this.rideName = Rides.rideLookupDictionary [ride];
 		}
 	}
+	#region sorcerer card events
+	public class AskBuySorcererCardEvent : IEvent
+	{
+		public int cost;
+		public AskBuySorcererCardEvent(int cost)
+		{
+			this.cost = cost;
+		}
+	}
+	public class BuySorcererCardEvent : IEvent
+	{
+		public int cost;
+		public BuySorcererCardEvent(int cost)
+		{
+			this.cost = cost;
+		}
+	}
+	public class SkipBuySorcererCardEvent : IEvent {}
+	#endregion
 	// Handle the UI Interaction when deciding to pay to ride or skip
 	public class PayToRideEvent : IEvent
 	{

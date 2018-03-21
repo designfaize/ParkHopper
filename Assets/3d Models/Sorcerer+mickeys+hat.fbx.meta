@@ -1,0 +1,227 @@
+fileFormatVersion: 2
+guid: 5481854c7a4874c27892cc6868a0a24f
+timeCreated: 1521649929
+licenseType: Pro
+ModelImporter:
+  serializedVersion: 22
+  fileIDToRecycleName:
+    100000: Component_12_1
+    100002: Component_13_1
+    100004: Component_14_1
+    100006: Component_15_1
+    100008: Component_17_1
+    100010: Component_1_1
+    100012: Component_5_1
+    100014: Component_6_1
+    100016: Component_6_2
+    100018: Component_9_1
+    100020: cone1
+    100022: cresent_moon1
+    100024: cresent_moon2
+    100026: Group1
+    100028: Mesh1
+    100030: Mesh10
+    100032: Mesh11
+    100034: Mesh12
+    100036: Mesh13
+    100038: Mesh14
+    100040: Mesh2
+    100042: Mesh3
+    100044: Mesh4
+    100046: Mesh5
+    100048: Mesh6
+    100050: Mesh7
+    100052: Mesh8
+    100054: Mesh9
+    100056: //RootNode
+    100058: Yellow_Star1
+    100060: Yellow_Star2
+    100062: Yellow_Star_1_1
+    100064: Yellow_Star_1_2
+    100066: Yellow_Star_2_1
+    100068: Yellow_Star_3_1
+    400000: Component_12_1
+    400002: Component_13_1
+    400004: Component_14_1
+    400006: Component_15_1
+    400008: Component_17_1
+    400010: Component_1_1
+    400012: Component_5_1
+    400014: Component_6_1
+    400016: Component_6_2
+    400018: Component_9_1
+    400020: cone1
+    400022: cresent_moon1
+    400024: cresent_moon2
+    400026: Group1
+    400028: Mesh1
+    400030: Mesh10
+    400032: Mesh11
+    400034: Mesh12
+    400036: Mesh13
+    400038: Mesh14
+    400040: Mesh2
+    400042: Mesh3
+    400044: Mesh4
+    400046: Mesh5
+    400048: Mesh6
+    400050: Mesh7
+    400052: Mesh8
+    400054: Mesh9
+    400056: //RootNode
+    400058: Yellow_Star1
+    400060: Yellow_Star2
+    400062: Yellow_Star_1_1
+    400064: Yellow_Star_1_2
+    400066: Yellow_Star_2_1
+    400068: Yellow_Star_3_1
+    2300000: Mesh1
+    2300002: Mesh10
+    2300004: Mesh11
+    2300006: Mesh12
+    2300008: Mesh13
+    2300010: Mesh14
+    2300012: Mesh2
+    2300014: Mesh3
+    2300016: Mesh4
+    2300018: Mesh5
+    2300020: Mesh6
+    2300022: Mesh7
+    2300024: Mesh8
+    2300026: Mesh9
+    3300000: Mesh1
+    3300002: Mesh10
+    3300004: Mesh11
+    3300006: Mesh12
+    3300008: Mesh13
+    3300010: Mesh14
+    3300012: Mesh2
+    3300014: Mesh3
+    3300016: Mesh4
+    3300018: Mesh5
+    3300020: Mesh6
+    3300022: Mesh7
+    3300024: Mesh8
+    3300026: Mesh9
+    4300000: Mesh1
+    4300002: Mesh2
+    4300004: Mesh3
+    4300006: Mesh4
+    4300008: Mesh5
+    4300010: Mesh6
+    4300012: Mesh7
+    4300014: Mesh8
+    4300016: Mesh9
+    4300018: Mesh10
+    4300020: Mesh11
+    4300022: Mesh12
+    4300024: Mesh13
+    4300026: Mesh14
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Color_008
+    second: {fileID: 2100000, guid: da1d59c0946d34044a52c2ddd1999c5d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Color_D01
+    second: {fileID: 2100000, guid: 137b09d2d9fa14f84a8f417c1fe29e16, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Color_E01
+    second: {fileID: 2100000, guid: 30f3e3c3d74714df4b7d1a6453d5851f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Color_I18
+    second: {fileID: 2100000, guid: c00ffa6f80b3647678796f4d255d74ff, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: FrontColor
+    second: {fileID: 2100000, guid: f78a3b921f76f4204aca5a454f5e7484, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Translucent_Glass_Gold
+    second: {fileID: 2100000, guid: 97a3a962d666649b6952b31185bddc15, type: 2}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 0
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

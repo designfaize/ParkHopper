@@ -193,8 +193,8 @@
      <Compile Include="Assets\Scripts\DieValue.cs" />
      <Compile Include="Assets\Scripts\DisplayDieValue.cs" />
      <Compile Include="Assets\Scripts\EventDispatcher.cs" />
-     <Compile Include="Assets\Scripts\GameController.cs" />
      <Compile Include="Assets\Scripts\IEvent.cs" />
+     <Compile Include="Assets\Scripts\MainModel.cs" />
      <Compile Include="Assets\Scripts\ParkHopperEvents.cs" />
      <Compile Include="Assets\Scripts\PathFollower.cs" />
      <Compile Include="Assets\Scripts\PendingList.cs" />
@@ -202,9 +202,11 @@
      <Compile Include="Assets\Scripts\Rides.cs" />
      <Compile Include="Assets\Scripts\RollDiceView.cs" />
      <Compile Include="Assets\Scripts\TileBehavior.cs" />
+     <Compile Include="Assets\Scripts\UI\BuySorcererCardUI.cs" />
      <Compile Include="Assets\Scripts\UI\PayToRideView.cs" />
      <Compile Include="Assets\Scripts\UI\PlayerUIView.cs" />
      <Compile Include="Assets\Scripts\UI\StatusMessageUIView.cs" />
+     <Compile Include="Assets\SorcererCardManager.cs" />
      <None Include="Assets\3rd Party Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
      <None Include="Assets\3rd Party Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
      <None Include="Assets\3rd Party Assets\Standard Assets\Effects\ToonShading\Shaders\ToonBasic.shader" />

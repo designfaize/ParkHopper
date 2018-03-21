@@ -67,17 +67,30 @@ public class PathFollower : MonoBehaviour {
 	{
 		if (_currentPlayer.currentPoint != _currentPlayer.rollDestination) {
 			moveComplete = false;
-			// Calculate distance between where ware and where we need to be.
-			float dist = Vector3.Distance (_currentPlayer.nextDestination, _currentPlayer.transform.position);
-			Debug.Log ("Distance : " + dist);
-			_currentPlayer.transform.position = Vector3.LerpUnclamped (_currentPlayer.transform.position, _currentPlayer.nextDestination, Time.deltaTime * speed);
-
-			if (dist <= reachDistance) {
-				_currentPlayer.currentPoint++;
-				if (_currentPlayer.currentPoint >= path.Count)
-					_currentPlayer.currentPoint = 0;
-				_currentPlayer.nextDestination = new Vector3 (path [_currentPlayer.currentPoint].position.x, path [_currentPlayer.currentPoint].position.y + heightToAddToDest, path [_currentPlayer.currentPoint].position.z);
+			float dist;
+			// If moving backwards
+			if (_currentPlayer.currentPoint > _currentPlayer.rollDestination) 
+			{
+				dist = Vector3.Distance (path [_currentPlayer.rollDestination-1].position, _currentPlayer.transform.position);
+				_currentPlayer.transform.position = Vector3.LerpUnclamped (_currentPlayer.transform.position, path [_currentPlayer.rollDestination-1].position, Time.deltaTime * speed);
+				if (dist <= reachDistance) {
+					_currentPlayer.currentPoint = _currentPlayer.rollDestination;
+					_currentPlayer.nextDestination = new Vector3 (path [_currentPlayer.currentPoint].position.x, path [_currentPlayer.currentPoint].position.y + heightToAddToDest, path [_currentPlayer.currentPoint].position.z);
+				}
 			}
+			else 
+			{
+				// Calculate distance between where ware and where we need to be.
+				dist = Vector3.Distance (_currentPlayer.nextDestination, _currentPlayer.transform.position);
+				_currentPlayer.transform.position = Vector3.LerpUnclamped (_currentPlayer.transform.position, _currentPlayer.nextDestination, Time.deltaTime * speed);
+				if (dist <= reachDistance) {
+					_currentPlayer.currentPoint++;
+					if (_currentPlayer.currentPoint >= path.Count)
+						_currentPlayer.currentPoint = 0;
+					_currentPlayer.nextDestination = new Vector3 (path [_currentPlayer.currentPoint].position.x, path [_currentPlayer.currentPoint].position.y + heightToAddToDest, path [_currentPlayer.currentPoint].position.z);
+				}
+			}
+
 		} else if (_currentlyBoarding == Rides.Ride.ThunderMountain) {
 			float dist = Vector3.Distance (bigThunderSeat.position, _currentPlayer.transform.position);
 			_currentPlayer.transform.position = Vector3.LerpUnclamped (_currentPlayer.transform.position, bigThunderSeat.position, Time.deltaTime * speed);
@@ -96,7 +109,7 @@ public class PathFollower : MonoBehaviour {
 					_currentlyReturning = Rides.Ride.ThunderMountain;
 					_currentPlayer.rollDestination = bigThunderExitTileIndex;
 					_currentPlayer.nextDestination = path [bigThunderExitTileIndex].position;
-					_currentPlayer.currentPoint = bigThunderExitTileIndex - 1;
+					_currentPlayer.currentPoint = bigThunderExitTileIndex-1;
 				} else {
 					nextBigThunderLocation = thunderMountainPath [bigThunderPosition].position;
 				}

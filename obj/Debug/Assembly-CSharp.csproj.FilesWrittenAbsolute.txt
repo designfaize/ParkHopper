@@ -56,3 +56,4 @@
 /Users/jwood/Documents/repos/ParkHopper/Temp/bin/Debug/Unity.CecilTools.dll
 /Users/jwood/Documents/repos/ParkHopper/Temp/bin/Debug/Unity.Cecil.Pdb.dll
 /Users/jwood/Documents/repos/ParkHopper/Temp/bin/Debug/Unity.Cecil.Mdb.dll
+/Users/jwood/Documents/repos/ParkHopper/Temp/bin/Debug/UnityEditor.UI.dll

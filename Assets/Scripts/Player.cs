@@ -9,6 +9,7 @@ public class Player : MonoBehaviour
 	[SerializeField]
 	private int fastPasses = 0;
 	private int cash = 0;
+	private int sorcererCards = 0;
 
 	public int currentPoint;
 	public int rollDestination = 0;
@@ -23,6 +24,11 @@ public class Player : MonoBehaviour
 	public void addFastPass()
 	{
 		fastPasses++;
+		sendPlayerBalanceUpdateEvent ();
+	}
+	public void addSorcererCard()
+	{
+		sorcererCards++;
 		sendPlayerBalanceUpdateEvent ();
 	}
 	public void useFastPass()
@@ -44,6 +50,6 @@ public class Player : MonoBehaviour
 	}
 	private void sendPlayerBalanceUpdateEvent()
 	{
-		EventDispatcher.DispatchEvent (new PlayerBalanceUpdateEvent (cash, fastPasses, playerNumber));
+		EventDispatcher.DispatchEvent (new PlayerBalanceUpdateEvent (cash, fastPasses, playerNumber, sorcererCards));
 	}
 }

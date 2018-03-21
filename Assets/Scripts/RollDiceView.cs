@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using ParkHopper.Events;
+using System;
 
 
 public class RollDiceView : MonoBehaviour {
@@ -13,7 +14,12 @@ public class RollDiceView : MonoBehaviour {
 	private Button button;
 	[SerializeField]
 	private GameObject panel;
+	[SerializeField]
+	private bool cheatMode = true;
+	[SerializeField]
+	private InputField cheatInput;
 
+	private int _player;
 	// Use this for initialization
 	void Start () 
 	{
@@ -26,19 +32,21 @@ public class RollDiceView : MonoBehaviour {
 	void Update () {
 		
 	}
-	private void UpdateText(int player)
+	private void UpdateText()
 	{
-		text.SetText("Your up Player " + player + "!");
+		text.SetText("Your up Player " + _player.ToString() + "!");
 	}
 	private void OnTurnEnd(IEvent e)
 	{
 		TurnEndEvent evt = (TurnEndEvent)e;
-		UpdateText (evt.currentPlayer);
+		_player = evt.currentPlayer;
+		UpdateText ();
 		ShowUI();
 	}
 	private void OnGameStart(IEvent e)
 	{
-		UpdateText (1);
+		_player = 1;
+		UpdateText ();
 		ShowUI();
 	}
 	private void ShowUI()
@@ -51,7 +59,10 @@ public class RollDiceView : MonoBehaviour {
 	}
 	private void onRollButtonClick()
 	{
-		EventDispatcher.DispatchEvent (new DiceRollBeginEvent());
+		if (cheatMode && !string.IsNullOrEmpty(cheatInput.text))
+			EventDispatcher.DispatchEvent (new DiceRollCompleteEvent (Int32.Parse(cheatInput.text), _player));
+		else 
+			EventDispatcher.DispatchEvent (new DiceRollBeginEvent());
 		HideUI ();
 	}
 }

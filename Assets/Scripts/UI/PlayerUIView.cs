@@ -12,6 +12,8 @@ public class PlayerUIView : MonoBehaviour {
 	private TextMeshProUGUI fastpasses;
 	[SerializeField]
 	private TextMeshProUGUI cash;
+	[SerializeField]
+	private GameObject sorcererCard;
 	// Use this for initialization
 	void Start () {
 		EventDispatcher.AddListener<PlayerBalanceUpdateEvent> (onBalanceUpdateEvent);
@@ -28,6 +30,10 @@ public class PlayerUIView : MonoBehaviour {
 		{
 			fastpasses.SetText( evt.fastPasses.ToString());
 			cash.SetText ("$" + evt.cash.ToString());
+			if (evt.sorcererCards > 0)
+				sorcererCard.SetActive (true);
+			else 
+				sorcererCard.SetActive (false);
 		}
 	}
 }
