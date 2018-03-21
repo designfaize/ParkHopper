@@ -13,6 +13,7 @@ public class TileBehavior : MonoBehaviour {
 		Get,
 		ForceMove,
 		Lose,
+		RollAgain,
 		Empty
 	}
 	public TileType tile;

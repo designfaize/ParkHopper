@@ -3,7 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using ParkHopper.Events;
 public class GameController : MonoBehaviour {
-	private Rect rectModeSelect;
+	[SerializeField] 
+	private Camera playerCamera;
+	[SerializeField]
+	private Camera diceCamera;
+
 	[SerializeField]
 	private GameObject spawnPoint;
 	[SerializeField]
@@ -20,8 +24,16 @@ public class GameController : MonoBehaviour {
 	private int startingCash;
 	[SerializeField]
 	private int startingFastpasses;
+	[SerializeField]
+	private GameObject diceSpawn;
 	private Player currentPlayer;
 
+	private const string DIE_TYPE = "1d6";
+	private const string DIE_COLOR = "blue";
+	private const string DIE_MATERIAL = "d6-";
+
+	private const float ROLL_AGAIN_DELAY = 1f;
+	private const float FORCE_MOVE_DELAY = 2f;
 	private PlayerLandedOnTileEvent _currentPayToRideEvent;
 	// Use this for initialization
 	void Start () {
@@ -31,8 +43,17 @@ public class GameController : MonoBehaviour {
 		EventDispatcher.AddListener<PlayerLandedOnTileEvent> (onPlayerLandedOnTileEvent);
 		EventDispatcher.AddListener<PayToRideEvent> (onPlayerPaidToRide);
 		EventDispatcher.AddListener<PayToRideSkipEvent> (onPlayerPaidToRideSkip);
-		rectModeSelect =  new Rect(10,10,180,80);
+		EventDispatcher.AddListener<DiceRollBeginEvent> (onDiceRollBeginEvent);
 		setupPlayers ();
+		EventDispatcher.DispatchEvent (new GameStartEvent ());
+	}
+	private void onDiceRollBeginEvent(IEvent e)
+	{
+		diceCamera.gameObject.SetActive (true);
+		playerCamera.gameObject.SetActive (false);
+		Dice.Clear();
+		for (int i = 0; i < numberOfDie; i++)
+			Dice.Roll(DIE_TYPE, DIE_MATERIAL + DIE_COLOR, diceSpawn.transform.position, Force());
 	}
 	private void setupPlayers()
 	{
@@ -67,6 +88,7 @@ public class GameController : MonoBehaviour {
 		{
 			case TileBehavior.TileType.FastPass:
 				currentPlayer.addFastPass ();
+				EventDispatcher.DispatchEvent(new ShowUIMessageEvent("Player " + currentPlayer.playerNumber +" Got a FastPass"));
 				endTurn ();
 				break;
 			case TileBehavior.TileType.Pay:
@@ -81,21 +103,38 @@ public class GameController : MonoBehaviour {
 				break;
 			case TileBehavior.TileType.Get:
 				currentPlayer.addCash(evt.value);
+				EventDispatcher.DispatchEvent(new ShowUIMessageEvent("Player " + currentPlayer.playerNumber +" Got $"+evt.value.ToString()));
 				endTurn ();
 				break;
 			case TileBehavior.TileType.Lose:
 				currentPlayer.removeCash(evt.value);
+				EventDispatcher.DispatchEvent(new ShowUIMessageEvent("Player " + currentPlayer.playerNumber +" Lost $"+evt.value.ToString()));
 				endTurn ();
 				break;
 			case TileBehavior.TileType.ForceMove:
 				// If the turn is a force move, simulate another dice roll for the same player.  Do not end the turn.
 				// We will get another onPlayerLandedOnTileEvent once the move is complete and we can re-eval the players status.
-				EventDispatcher.DispatchEvent (new DiceRollCompleteEvent (evt.value, currentPlayer.playerNumber));
+				ShowUIMessageEvent uiMessage;
+				if (evt.value > 0) 
+				uiMessage = new ShowUIMessageEvent("Move Forward " + evt.value.ToString() + " Spaces");
+				else 
+					uiMessage = new ShowUIMessageEvent("Move Back " + evt.value.ToString() + " Spaces");
+				EventDispatcher.DispatchEvent(uiMessage);
+				StartCoroutine(SendEventAfterDelay(new DiceRollCompleteEvent (evt.value, currentPlayer.playerNumber),FORCE_MOVE_DELAY));
+				break;
+			case TileBehavior.TileType.RollAgain:
+				EventDispatcher.DispatchEvent(new ShowUIMessageEvent("Player " + currentPlayer.playerNumber +" Roll Again!"));
+				StartCoroutine(SendEventAfterDelay(new DiceRollBeginEvent (), ROLL_AGAIN_DELAY));
 				break;
 			default:
 				endTurn ();
 				break;
 		}
+	}
+	private IEnumerator SendEventAfterDelay(IEvent e, float delay)
+	{
+		yield return new WaitForSeconds(delay);
+		EventDispatcher.DispatchEvent (e);
 	}
 	private void endTurn()
 	{
@@ -117,6 +156,8 @@ public class GameController : MonoBehaviour {
 		{
 			EventDispatcher.DispatchEvent (new DiceRollCompleteEvent (_totalDiceValueThisRoll, currentPlayer.playerNumber));
 			ResetDice ();
+			diceCamera.gameObject.SetActive(false);
+			playerCamera.gameObject.SetActive(true);
 		}
 	}
 	private void ResetDice()
@@ -129,18 +170,6 @@ public class GameController : MonoBehaviour {
 		Vector3 rollTarget = Vector3.zero + new Vector3(2 + 7 * Random.value, .5F + 4 * Random.value, -2 - 3 * Random.value);
 		return Vector3.Lerp(spawnPoint.transform.position, rollTarget, 1).normalized * (-35 - Random.value * 20);
 	}
-	// handle GUI
-	void OnGUI()
-	{
-		// Make mode selection box
-		GUI.Box (rectModeSelect, "Dice Demo");
 
-		if (GUI.Button (new Rect (20,60,160,20), "Roll Dice")) 
-		{
-			Dice.Clear();
-			spawnPoint = GameObject.Find("spawnPoint");
-			for (int i = 0; i < numberOfDie; i++)
-				Dice.Roll("1d6", "d6-" + "blue", spawnPoint.transform.position, Force());
-		}
-	}
+	 
 }

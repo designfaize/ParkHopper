@@ -10,6 +10,8 @@ namespace ParkHopper.Events
 		{
 			EventDispatcher.CreateScope (
 				EventDispatcher.DEFAULT_SCOPE_ID,
+				typeof (GameStartEvent),
+				typeof (ShowUIMessageEvent),
 				typeof (PlayerBalanceUpdateEvent),
 				typeof (DiceRollBeginEvent),
 				typeof (DieAtRestEvent),
@@ -29,6 +31,15 @@ namespace ParkHopper.Events
 	}
  
 	public class DummyEvent : IEvent { }
+	public class GameStartEvent : IEvent { }
+	public class ShowUIMessageEvent : IEvent 
+	{
+		public string message;
+		public ShowUIMessageEvent (string message)
+		{
+			this.message = message;
+		}
+	}
 	public class PlayerBalanceUpdateEvent : IEvent 
 	{
 		public int cash;

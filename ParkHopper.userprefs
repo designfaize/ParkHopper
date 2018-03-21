@@ -1,0 +1,17 @@
+﻿<Properties StartupItem="Assembly-CSharp.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/3rd Party Assets/KajamansRoads/Free/ReadMe.txt">
+    <Files>
+      <File FileName="Assets/Scripts/PathFollower.cs" Line="47" Column="1" />
+      <File FileName="Assets/Scripts/GameController.cs" Line="46" Column="57" />
+      <File FileName="Assets/Scripts/RollDiceView.cs" Line="18" Column="12" />
+      <File FileName="Assets/Scripts/ParkHopperEvents.cs" Line="33" Column="29" />
+      <File FileName="Assets/Scripts/EventDispatcher.cs" Line="98" Column="1" />
+      <File FileName="Assets/3rd Party Assets/KajamansRoads/Free/ReadMe.txt" Line="1" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

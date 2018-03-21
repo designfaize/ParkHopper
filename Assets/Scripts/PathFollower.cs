@@ -15,7 +15,13 @@ public class PathFollower : MonoBehaviour {
 	private Player[] players;
 	[SerializeField]
 	private Transform bigThunderMountain;
+	[SerializeField]
+	private Transform bigThunderSeat;
+	[SerializeField]
+	private int bigThunderExitTileIndex;
 
+	private Vector3 nextBigThunderLocation;
+	private int bigThunderPosition = 0;
 	public List<Transform> thunderMountainPath = new List<Transform>();
 
 	private bool moveComplete = true;
@@ -25,6 +31,8 @@ public class PathFollower : MonoBehaviour {
 	private Player _currentPlayer;
 
 	private Rides.Ride _currentlyRiding= Rides.Ride.Empty;
+	private Rides.Ride _currentlyBoarding= Rides.Ride.Empty;
+	private Rides.Ride _currentlyReturning = Rides.Ride.Empty;
 	// Use this for initialization
 	void Awake () 
 	{
@@ -32,8 +40,6 @@ public class PathFollower : MonoBehaviour {
 			path.Add (obj.transform);
 		_currentPlayer = players[0];
 		_currentPlayer.nextDestination = new Vector3 (path [_currentPlayer.currentPoint].position.x, path [_currentPlayer.currentPoint].position.y + heightToAddToDest, path [_currentPlayer.currentPoint].position.z);
-		_currentPlayer.midwayToNextDestination = new Vector3 (path [_currentPlayer.currentPoint].position.x, path [_currentPlayer.currentPoint].position.y + heightToAddInBetweenPieces, path [_currentPlayer.currentPoint].position.z);
-		_currentPlayer.nextDistance= Vector3.Distance(_currentPlayer.nextDestination, _currentPlayer.transform.position);
 		ParkHopperEvents.RegisterEvents ();
 		EventDispatcher.AddListener<DiceRollCompleteEvent> (onDiceRollComplete);
 		EventDispatcher.AddListener<PayToRideEvent> (onPayToRideEvent);
@@ -44,8 +50,6 @@ public class PathFollower : MonoBehaviour {
 		TurnEndEvent evt = (TurnEndEvent)e;
 		_currentPlayer = players [evt.currentPlayer - 1];
 		_currentPlayer.nextDestination = new Vector3 (path [_currentPlayer.currentPoint].position.x, path [_currentPlayer.currentPoint].position.y + heightToAddToDest, path [_currentPlayer.currentPoint].position.z);
-		_currentPlayer.nextDistance= Vector3.Distance(_currentPlayer.nextDestination, path[_currentPlayer.currentPoint].position);
-		_currentPlayer.midwayToNextDestination = new Vector3 (path [_currentPlayer.currentPoint].position.x, path [_currentPlayer.currentPoint].position.y + heightToAddInBetweenPieces, path [_currentPlayer.currentPoint].position.z);
 	}
 	void onDiceRollComplete(IEvent e)
 	{
@@ -61,31 +65,53 @@ public class PathFollower : MonoBehaviour {
 	// Update is called once per frame
 	void Update()
 	{
-	if (_currentPlayer.currentPoint != _currentPlayer.rollDestination) {
+		if (_currentPlayer.currentPoint != _currentPlayer.rollDestination) {
 			moveComplete = false;
 			// Calculate distance between where ware and where we need to be.
 			float dist = Vector3.Distance (_currentPlayer.nextDestination, _currentPlayer.transform.position);
-			// If we _currentPlayer.midwayToNextDestinatione inbetween moves
-			Debug.Log("Distance : "+ dist);
-			float halfway = _currentPlayer.nextDistance / 2;
-			Debug.Log("halfway : "+ halfway);
-			//if (dist > halfway)
-			//	_currentPlayer.transform.position = Vector3.LerpUnclamped (_currentPlayer.transform.position, _currentPlayer.midwayToNextDestination, Time.deltaTime * speed);
-			//else
-				_currentPlayer.transform.position = Vector3.LerpUnclamped (_currentPlayer.transform.position, _currentPlayer.nextDestination, Time.deltaTime * speed);
+			Debug.Log ("Distance : " + dist);
+			_currentPlayer.transform.position = Vector3.LerpUnclamped (_currentPlayer.transform.position, _currentPlayer.nextDestination, Time.deltaTime * speed);
 
 			if (dist <= reachDistance) {
 				_currentPlayer.currentPoint++;
 				if (_currentPlayer.currentPoint >= path.Count)
 					_currentPlayer.currentPoint = 0;
-				_currentPlayer.midwayToNextDestination = new Vector3 (path [_currentPlayer.currentPoint].position.x, path [_currentPlayer.currentPoint].position.y + heightToAddInBetweenPieces, path [_currentPlayer.currentPoint].position.z);
-				_currentPlayer.nextDistance = Vector3.Distance (_currentPlayer.nextDestination, _currentPlayer.transform.position);;
 				_currentPlayer.nextDestination = new Vector3 (path [_currentPlayer.currentPoint].position.x, path [_currentPlayer.currentPoint].position.y + heightToAddToDest, path [_currentPlayer.currentPoint].position.z);
 			}
+		} else if (_currentlyBoarding == Rides.Ride.ThunderMountain) {
+			float dist = Vector3.Distance (bigThunderSeat.position, _currentPlayer.transform.position);
+			_currentPlayer.transform.position = Vector3.LerpUnclamped (_currentPlayer.transform.position, bigThunderSeat.position, Time.deltaTime * speed);
+			if (dist <= reachDistance / 2) {
+				_currentlyBoarding = Rides.Ride.Empty;
+				_currentlyRiding = Rides.Ride.ThunderMountain;
+			}
+		} else if (_currentlyRiding == Rides.Ride.ThunderMountain) {
+			float dist = Vector3.Distance (bigThunderMountain.position, nextBigThunderLocation);
+			bigThunderMountain.position = Vector3.MoveTowards (bigThunderMountain.position, nextBigThunderLocation, Time.deltaTime * speed);
+			_currentPlayer.transform.position = Vector3.MoveTowards (_currentPlayer.transform.position, bigThunderSeat.position, Time.deltaTime * speed);
+			if (dist <= reachDistance) {
+				bigThunderPosition++;
+				if (bigThunderPosition >= thunderMountainPath.Count) {
+					_currentlyRiding = Rides.Ride.Empty;
+					_currentlyReturning = Rides.Ride.ThunderMountain;
+					_currentPlayer.rollDestination = bigThunderExitTileIndex;
+					_currentPlayer.nextDestination = path [bigThunderExitTileIndex].position;
+					_currentPlayer.currentPoint = bigThunderExitTileIndex - 1;
+				} else {
+					nextBigThunderLocation = thunderMountainPath [bigThunderPosition].position;
+				}
+			}
 		}
-		else if (_currentlyRiding == Rides.Ride.ThunderMountain) 
+		else if (_currentlyReturning == Rides.Ride.ThunderMountain) 
 		{
-			float dist = Vector3.Distance (_currentPlayer.nextDestination, _currentPlayer.transform.position);
+			nextBigThunderLocation = thunderMountainPath [0].position;
+			bigThunderMountain.position = Vector3.MoveTowards (bigThunderMountain.position, nextBigThunderLocation, Time.deltaTime * speed);
+			_currentPlayer.transform.position = Vector3.MoveTowards (_currentPlayer.transform.position, _currentPlayer.nextDestination, Time.deltaTime * speed);
+			float dist = Vector3.Distance (bigThunderMountain.position, nextBigThunderLocation);
+			if (dist <= reachDistance) 
+			{
+				_currentlyReturning = Rides.Ride.Empty;
+			}
 		}
 		else 
 		{
@@ -101,8 +127,8 @@ public class PathFollower : MonoBehaviour {
 		switch (evt.ride) 
 		{
 		case Rides.Ride.ThunderMountain:
-			_currentlyRiding = evt.ride;
-			//_nextRideDestination = thunderMountainPath [0].position;
+			_currentlyBoarding = evt.ride;
+			nextBigThunderLocation = thunderMountainPath [0].position;
 			break;
 		default:
 			break;
