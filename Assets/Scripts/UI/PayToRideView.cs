@@ -13,7 +13,7 @@ public class PayToRideView : MonoBehaviour {
 	[SerializeField]
 	private GameObject payToRidePanel;
 
-	private Rides.Ride _ride;
+	private TileBehavior.Ride _ride;
 	void Start()
 	{
 		EventDispatcher.AddListener<AskPayToRideEvent>(onAskPayToRideEvent);

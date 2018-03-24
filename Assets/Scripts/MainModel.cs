@@ -37,7 +37,7 @@ namespace ParkHopper
 		private const float ROLL_AGAIN_DELAY = 1f;
 		private const float FORCE_MOVE_DELAY = 2f;
 		private PlayerLandedOnTileEvent _currentPayToRideEvent;
-
+		private PlayerLandedOnTileEvent _previousPlayerLandedOnTileEvent;
 		// Managers
 		 
 		// Use this for initialization
@@ -51,6 +51,9 @@ namespace ParkHopper
 			EventDispatcher.AddListener<DiceRollBeginEvent> (onDiceRollBeginEvent);
 			EventDispatcher.AddListener<BuySorcererCardEvent> (onBuySorcererCardEvent);
 			EventDispatcher.AddListener<SkipBuySorcererCardEvent> (onSkipBuySorcererCardEvent);
+			EventDispatcher.AddListener<UseSorcererCardEvent> (onUseSorcererCardEvent);
+			EventDispatcher.AddListener<SkipUseSorcererCardEvent> (onSkipUseSorcererCardEvent);
+
 
 			setupPlayers ();
 			EventDispatcher.DispatchEvent (new GameStartEvent ());
@@ -91,6 +94,7 @@ namespace ParkHopper
 		private void onPlayerLandedOnTileEvent(IEvent e)
 		{
 			PlayerLandedOnTileEvent evt = (PlayerLandedOnTileEvent) e;
+			_previousPlayerLandedOnTileEvent = evt;
 			Debug.Log (evt.tileType.ToString () + " " + evt.value);
 			switch (evt.tileType) 
 			{
@@ -100,13 +104,14 @@ namespace ParkHopper
 					EndTurn ();
 					break;
 				case TileBehavior.TileType.Pay:
-					if (currentPlayer.getCashBalance() < evt.value)
+					if (currentPlayer.getCashBalance () < evt.value) {
+						EventDispatcher.DispatchEvent (new ShowUIMessageEvent ("Not enough Cash to ride " + TileBehavior.rideLookupDictionary [evt.ride]));
 						EndTurn ();
+					}
 					else 
 					{
 						_currentPayToRideEvent = evt;
-						Debug.LogWarning ("TODO:  Add dynamic Ride getting");
-						EventDispatcher.DispatchEvent (new AskPayToRideEvent (ParkHopper.Rides.Ride.ThunderMountain, evt.value));
+						EventDispatcher.DispatchEvent (new AskPayToRideEvent (evt.ride, evt.value));
 					}
 					break;
 				case TileBehavior.TileType.BuySorcererCard:
@@ -137,6 +142,25 @@ namespace ParkHopper
 					EventDispatcher.DispatchEvent(new ShowUIMessageEvent("Player " + currentPlayer.playerNumber +" Roll Again!"));
 					StartCoroutine(SendEventAfterDelay(new DiceRollBeginEvent (), ROLL_AGAIN_DELAY));
 					break;
+				case TileBehavior.TileType.VilliansMove:
+					if (currentPlayer.getSorcererCards () > 0)
+						EventDispatcher.DispatchEvent (new AskUseSorcererCardEvent ());
+					else 
+					{
+						EventDispatcher.DispatchEvent (new ShowUIMessageEvent ("No Sorcerer Cards.  Move Back " + evt.value.ToString () + " Spaces"));
+						StartCoroutine (SendEventAfterDelay (new DiceRollCompleteEvent (evt.value, currentPlayer.playerNumber), FORCE_MOVE_DELAY));
+					}
+					break;
+				case TileBehavior.TileType.VilliansLoseCash:
+					if (currentPlayer.getSorcererCards () > 0)
+						EventDispatcher.DispatchEvent (new AskUseSorcererCardEvent ());
+					else 
+					{
+						currentPlayer.removeCash(evt.value);
+						EventDispatcher.DispatchEvent(new ShowUIMessageEvent("No Sorcerer Cards.  Player " + currentPlayer.playerNumber +" Lost $"+evt.value.ToString()));
+						EndTurn ();
+					}
+					break;
 				default:
 					EndTurn ();
 					break;
@@ -147,6 +171,22 @@ namespace ParkHopper
 			currentPlayer.removeCash (((BuySorcererCardEvent)e).cost);
 			currentPlayer.addSorcererCard ();
 			EndTurn ();
+		}
+		private void onUseSorcererCardEvent(IEvent e)
+		{
+			currentPlayer.useSorcererCard ();
+			EndTurn ();
+		}
+		private void onSkipUseSorcererCardEvent(IEvent e)
+		{
+			if (_previousPlayerLandedOnTileEvent.tileType == TileBehavior.TileType.VilliansMove) 
+			{
+				EventDispatcher.DispatchEvent(new PlayerLandedOnTileEvent(TileBehavior.TileType.ForceMove,_previousPlayerLandedOnTileEvent.value,TileBehavior.Ride.Empty));
+			} 
+			else 
+			{
+				EventDispatcher.DispatchEvent(new PlayerLandedOnTileEvent(TileBehavior.TileType.Lose,_previousPlayerLandedOnTileEvent.value,TileBehavior.Ride.Empty));
+			}
 		}
 		private void onSkipBuySorcererCardEvent(IEvent e)
 		{

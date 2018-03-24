@@ -315,6 +315,7 @@
 'Assets/Scripts/UI/PayToRideView.cs'
 'Assets/Scripts/UI/PlayerUIView.cs'
 'Assets/Scripts/UI/StatusMessageUIView.cs'
+'Assets/Scripts/UI/UseSorcererCardView.cs'
 'Assets/SorcererCardManager.cs'
 -r:'/Applications/Unity/Unity.app/Contents/Mono/lib/mono/unity/System.Runtime.Serialization.dll'
 -r:'/Applications/Unity/Unity.app/Contents/Mono/lib/mono/unity/System.Xml.Linq.dll'

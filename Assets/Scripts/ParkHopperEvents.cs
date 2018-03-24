@@ -26,6 +26,9 @@ namespace ParkHopper.Events
 				typeof (AskBuySorcererCardEvent),
 				typeof (BuySorcererCardEvent),
 				typeof (SkipBuySorcererCardEvent),
+				typeof (UseSorcererCardEvent),
+				typeof (SkipUseSorcererCardEvent),
+				typeof (AskUseSorcererCardEvent),
 
 
 				// Dummy event, so you don't have to remember about adding an extra
@@ -82,10 +85,12 @@ namespace ParkHopper.Events
 	{
 		public TileBehavior.TileType tileType;
 		public int value;
-		public PlayerLandedOnTileEvent(TileBehavior.TileType tileType, int value)
+		public TileBehavior.Ride ride;
+		public PlayerLandedOnTileEvent(TileBehavior.TileType tileType, int value, TileBehavior.Ride ride)
 		{
 			this.tileType = tileType;
 			this.value = value;
+			this.ride = ride;
 		}
 	}
 	public class TurnEndEvent : IEvent
@@ -99,14 +104,14 @@ namespace ParkHopper.Events
 
 	public class AskPayToRideEvent : IEvent 
 	{
-		public Rides.Ride ride;
+		public TileBehavior.Ride ride;
 		public string rideName;
 		public int cost;
-		public AskPayToRideEvent(Rides.Ride ride, int cost)
+		public AskPayToRideEvent(TileBehavior.Ride ride, int cost)
 		{
 			this.ride = ride;
 			this.cost = cost;
-			this.rideName = Rides.rideLookupDictionary [ride];
+			this.rideName = TileBehavior.rideLookupDictionary [ride];
 		}
 	}
 	#region sorcerer card events
@@ -127,12 +132,16 @@ namespace ParkHopper.Events
 		}
 	}
 	public class SkipBuySorcererCardEvent : IEvent {}
+
+	public class UseSorcererCardEvent : IEvent {}
+	public class SkipUseSorcererCardEvent : IEvent {}
+	public class AskUseSorcererCardEvent : IEvent {}
 	#endregion
 	// Handle the UI Interaction when deciding to pay to ride or skip
 	public class PayToRideEvent : IEvent
 	{
-		public Rides.Ride ride;
-		public PayToRideEvent(Rides.Ride ride)
+		public TileBehavior.Ride ride;
+		public PayToRideEvent(TileBehavior.Ride ride)
 		{
 			this.ride = ride;
 		}

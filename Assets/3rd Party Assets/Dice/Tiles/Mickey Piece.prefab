@@ -363,6 +363,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tile: 3
   value: -10
+  ride: 0
   textMesh: {fileID: 114902970482335974}
 --- !u!114 &114902970482335974
 MonoBehaviour:

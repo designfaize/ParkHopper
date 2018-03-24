@@ -17,6 +17,18 @@ public class Player : MonoBehaviour
 	public Vector3 midwayToNextDestination;
 	public float nextDistance;
 
+	public int getSorcererCards()
+	{
+		return sorcererCards;
+	}
+	public void useSorcererCard()
+	{
+		if (sorcererCards > 0)
+			sorcererCards--;
+		else
+			Debug.LogError ("Tried to remove a sorerer card the user didn't have");
+		sendPlayerBalanceUpdateEvent ();
+	}
 	public int getCashBalance()
 	{
 		return cash;
