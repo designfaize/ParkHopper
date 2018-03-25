@@ -38,6 +38,26 @@ public class PathFollower : MonoBehaviour
 	private int splashExitTileIndex =26;
 	#endregion
 
+	#region test track vars
+	// Test Track
+	private int testTrackPosition = 0;
+	public GameObject testTrackPathContainer;
+	private List<Transform> testTrackPath = new List<Transform>();
+	private Vector3 nexttestTrackLocation;
+	[SerializeField]
+	private int testTrackExitTileIndex;
+	#endregion
+
+	#region Figment vars
+	// Figment
+	private int figmentPosition = 0;
+	public GameObject figmentPathContainer;
+	private List<Transform> figmentPath = new List<Transform>();
+	private Vector3 nextFigmentLocation;
+	[SerializeField]
+	private int figmentExitTileIndex;
+	#endregion
+
 	#region space vars
 	private int space1Position = 0;
 	private int space2Position = 0;
@@ -92,6 +112,14 @@ public class PathFollower : MonoBehaviour
 		foreach (Transform child in spaceMountainPathContainer2.transform)
 		{
 			space2MountainPath.Add (child);
+		}
+		foreach (Transform child in testTrackPathContainer.transform)
+		{
+			testTrackPath.Add (child);
+		}
+		foreach (Transform child in figmentPathContainer.transform)
+		{
+			figmentPath.Add (child);
 		}
 	}
 	private void onTurnEndEvent(IEvent e)
@@ -176,6 +204,10 @@ public class PathFollower : MonoBehaviour
 			RideNonSpecialRide (ref nextSpace1Location, ref space1Position, ref space1MountainPath, space1ExitTileIndex);
 		else if (_currentlyRiding == TileBehavior.Ride.SpaceMountain2) 
 			RideNonSpecialRide (ref nextSpace2Location, ref space2Position, ref space2MountainPath, space2ExitTileIndex);
+		else if (_currentlyRiding == TileBehavior.Ride.TestTrack) 
+			RideNonSpecialRide (ref nexttestTrackLocation, ref testTrackPosition, ref testTrackPath, testTrackExitTileIndex);
+		else if (_currentlyRiding == TileBehavior.Ride.Figment) 
+			RideNonSpecialRide (ref nextFigmentLocation, ref figmentPosition, ref figmentPath, figmentExitTileIndex);
 		else 
 		{
 			if (!moveComplete) {
@@ -196,9 +228,6 @@ public class PathFollower : MonoBehaviour
 				_currentPlayer.rollDestination = exitTileIndex;
 				_currentPlayer.nextDestination = path [exitTileIndex].position;
 				_currentPlayer.currentPoint = exitTileIndex - 1;
-				Debug.Log (_currentPlayer.rollDestination);
-				Debug.Log (_currentPlayer.nextDestination);
-				Debug.Log (exitTileIndex);
 				_justRoadARide = true;
 			} else {
 				nextRideLocation = list [nextPosition].position;
@@ -222,6 +251,12 @@ public class PathFollower : MonoBehaviour
 				break;
 			case TileBehavior.Ride.SpaceMountain2:
 				nextSpace2Location = space2MountainPath [0].position;
+				break;
+			case TileBehavior.Ride.TestTrack:
+				nexttestTrackLocation = testTrackPath [0].position;
+				break;
+			case TileBehavior.Ride.Figment:
+				nextFigmentLocation = figmentPath [0].position;
 				break;
 			default:
 				break;
@@ -257,6 +292,14 @@ public class PathFollower : MonoBehaviour
 			Gizmos.DrawSphere (child.position, reachDistance);
 		}
 		foreach (Transform child in spaceMountainPathContainer2.transform)
+		{
+			Gizmos.DrawSphere (child.position, reachDistance);
+		}
+		foreach (Transform child in testTrackPathContainer.transform)
+		{
+			Gizmos.DrawSphere (child.position, reachDistance);
+		}
+		foreach (Transform child in figmentPathContainer.transform)
 		{
 			Gizmos.DrawSphere (child.position, reachDistance);
 		}

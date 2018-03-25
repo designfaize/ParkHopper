@@ -16,6 +16,8 @@ namespace ParkHopper
 			SpaceMountain,
 			SpaceMountain1,
 			SpaceMountain2,
+			TestTrack,
+			Figment,
 			Empty
 		}
 		static TileBehavior()
@@ -26,6 +28,7 @@ namespace ParkHopper
 			rideLookupDictionary.Add (Ride.SpaceMountain, "Space Mountain");
 			rideLookupDictionary.Add (Ride.SpaceMountain1, "Space Mountain");
 			rideLookupDictionary.Add (Ride.SpaceMountain2, "Space Mountain");
+			rideLookupDictionary.Add (Ride.TestTrack, "Test Track");
 		}
 		public enum TileType
 		{
@@ -38,6 +41,7 @@ namespace ParkHopper
 			BuySorcererCard,
 			VilliansMove,
 			VilliansLoseCash,
+			Shop,
 			Empty
 		}
 		public TileType tile;
