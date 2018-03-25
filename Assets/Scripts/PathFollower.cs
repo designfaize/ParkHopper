@@ -6,7 +6,7 @@ using ParkHopper;
 
 public class PathFollower : MonoBehaviour 
 {
-	public GameObject[] pathObjects;
+	public GameObject pathObjects;
 	private List<Transform> path = new List<Transform>();
 	[SerializeField]
 	private float speed = 3.0f;
@@ -15,6 +15,7 @@ public class PathFollower : MonoBehaviour
 	[SerializeField]
 	private Player[] players;
 
+	#region bigthunder vars
 	[SerializeField]
 	private Transform bigThunderMountain;
 	[SerializeField]
@@ -25,14 +26,33 @@ public class PathFollower : MonoBehaviour
 	private int bigThunderPosition = 0;
 	public GameObject thunderMountainPathContainer;
 	private List<Transform> thunderMountainPath = new List<Transform>();
+	#endregion
 
+	#region splash vars
 	// Splash Mountain
 	private int splashPosition = 0;
 	public GameObject splashMountainPathContainer;
 	private List<Transform> splashMountainPath = new List<Transform>();
 	private Vector3 nextSplashLocation;
 	[SerializeField]
-	private int splashExitTileIndex;
+	private int splashExitTileIndex =26;
+	#endregion
+
+	#region space vars
+	private int space1Position = 0;
+	private int space2Position = 0;
+	public GameObject spaceMountainPathContainer1;
+	public GameObject spaceMountainPathContainer2;
+	private List<Transform> space1MountainPath = new List<Transform>();
+	private List<Transform> space2MountainPath = new List<Transform>();
+	private Vector3 nextSpace1Location;
+	private Vector3 nextSpace2Location;
+	[SerializeField]
+	private int space1ExitTileIndex = 33;
+	[SerializeField]
+	private int space2ExitTileIndex = 36;
+
+	#endregion
 
 	private bool moveComplete = true;
 	private float c;
@@ -48,13 +68,13 @@ public class PathFollower : MonoBehaviour
 	// Use this for initialization
 	void Awake () 
 	{
-		foreach (GameObject obj in pathObjects)
+		foreach (Transform obj in pathObjects.transform)
 			path.Add (obj.transform);
 		_currentPlayer = players[0];
 		_currentPlayer.nextDestination = new Vector3 (path [_currentPlayer.currentPoint].position.x, path [_currentPlayer.currentPoint].position.y + heightToAddToDest, path [_currentPlayer.currentPoint].position.z);
 		ParkHopperEvents.RegisterEvents ();
 		EventDispatcher.AddListener<DiceRollCompleteEvent> (onDiceRollComplete);
-		EventDispatcher.AddListener<PayToRideEvent> (onPayToRideEvent);
+		EventDispatcher.AddListener<BeginRideEvent> (onBeginRideEvent);
 		EventDispatcher.AddListener<TurnEndEvent> (onTurnEndEvent);
 
 		foreach (Transform child in splashMountainPathContainer.transform)
@@ -64,6 +84,14 @@ public class PathFollower : MonoBehaviour
 		foreach (Transform child in thunderMountainPathContainer.transform)
 		{
 			thunderMountainPath.Add (child);
+		}
+		foreach (Transform child in spaceMountainPathContainer1.transform)
+		{
+			space1MountainPath.Add (child);
+		}
+		foreach (Transform child in spaceMountainPathContainer2.transform)
+		{
+			space2MountainPath.Add (child);
 		}
 	}
 	private void onTurnEndEvent(IEvent e)
@@ -143,23 +171,11 @@ public class PathFollower : MonoBehaviour
 			}
 		} 
 		else if (_currentlyRiding == TileBehavior.Ride.SplashMountain) 
-		{
-			float dist = Vector3.Distance (_currentPlayer.transform.position, nextSplashLocation);
-			_currentPlayer.transform.position = Vector3.MoveTowards (_currentPlayer.transform.position, nextSplashLocation, Time.deltaTime * speed);
-			if (dist <= reachDistance) {
-				splashPosition++;
-				if (splashPosition >= splashMountainPath.Count) {
-					_currentlyRiding = TileBehavior.Ride.Empty;
-					splashPosition = 0;
-					_currentPlayer.rollDestination = splashExitTileIndex;
-					_currentPlayer.nextDestination = path [splashExitTileIndex].position;
-					_currentPlayer.currentPoint = splashExitTileIndex - 1;
-					_justRoadARide = true;
-				} else {
-					nextSplashLocation = splashMountainPath [splashPosition].position;
-				}
-			}
-		}
+			RideNonSpecialRide (ref nextSplashLocation, ref splashPosition, ref splashMountainPath, splashExitTileIndex);
+		else if (_currentlyRiding == TileBehavior.Ride.SpaceMountain1) 
+			RideNonSpecialRide (ref nextSpace1Location, ref space1Position, ref space1MountainPath, space1ExitTileIndex);
+		else if (_currentlyRiding == TileBehavior.Ride.SpaceMountain2) 
+			RideNonSpecialRide (ref nextSpace2Location, ref space2Position, ref space2MountainPath, space2ExitTileIndex);
 		else 
 		{
 			if (!moveComplete) {
@@ -168,21 +184,47 @@ public class PathFollower : MonoBehaviour
 			}
 		}
 	}
-	private void onPayToRideEvent(IEvent e)
+	private void RideNonSpecialRide(ref Vector3 nextRideLocation, ref int nextPosition, ref List<Transform> list, int exitTileIndex)
 	{
-		PayToRideEvent evt = (PayToRideEvent)e;
+		float dist = Vector3.Distance (_currentPlayer.transform.position, nextRideLocation);
+		_currentPlayer.transform.position = Vector3.MoveTowards (_currentPlayer.transform.position, nextRideLocation, Time.deltaTime * speed);
+		if (dist <= reachDistance) {
+			nextPosition++;
+			if (nextPosition >= list.Count) {
+				_currentlyRiding = TileBehavior.Ride.Empty;
+				nextPosition = 0;
+				_currentPlayer.rollDestination = exitTileIndex;
+				_currentPlayer.nextDestination = path [exitTileIndex].position;
+				_currentPlayer.currentPoint = exitTileIndex - 1;
+				Debug.Log (_currentPlayer.rollDestination);
+				Debug.Log (_currentPlayer.nextDestination);
+				Debug.Log (exitTileIndex);
+				_justRoadARide = true;
+			} else {
+				nextRideLocation = list [nextPosition].position;
+			}
+		}
+	}
+	private void onBeginRideEvent(IEvent e)
+	{
+		BeginRideEvent evt = (BeginRideEvent)e;
+		_currentlyRiding = evt.ride;
 		switch (evt.ride) 
 		{
-		case TileBehavior.Ride.ThunderMountain:
-			_currentlyBoarding = evt.ride;
-			nextBigThunderLocation = thunderMountainPath [0].position;
-			break;
-		case TileBehavior.Ride.SplashMountain:
-			_currentlyRiding = evt.ride;
-			nextSplashLocation = splashMountainPath [0].position;
-			break;
-		default:
-			break;
+			case TileBehavior.Ride.ThunderMountain:
+				nextBigThunderLocation = thunderMountainPath [0].position;
+				break;
+			case TileBehavior.Ride.SplashMountain:
+				nextSplashLocation = splashMountainPath [0].position;
+				break;
+			case TileBehavior.Ride.SpaceMountain1:
+				nextSpace1Location = space1MountainPath [0].position;
+				break;
+			case TileBehavior.Ride.SpaceMountain2:
+				nextSpace2Location = space2MountainPath [0].position;
+				break;
+			default:
+				break;
 		}
 	}
 	private PlayerLandedOnTileEvent GetCurrentTileEventData()
@@ -192,10 +234,12 @@ public class PathFollower : MonoBehaviour
 		{
 			_justRoadARide = false;
 			// Weird hack for stopping the ride on the wrong tile.  Fix later.
-			tileData = pathObjects [_currentPlayer.currentPoint].GetComponent<TileBehavior>();
+			tileData = path [_currentPlayer.currentPoint].GetComponent<TileBehavior>();
+			_currentPlayer.currentPoint++;
+			_currentPlayer.rollDestination++;
 		}
 		else
-			tileData = pathObjects [_currentPlayer.currentPoint-1].GetComponent<TileBehavior>();
+			tileData = path [_currentPlayer.currentPoint-1].GetComponent<TileBehavior>();
 		return new PlayerLandedOnTileEvent (tileData.tile, tileData.value,tileData.ride);
 	}
 	void OnDrawGizmos()
@@ -205,6 +249,14 @@ public class PathFollower : MonoBehaviour
 			Gizmos.DrawSphere (child.position, reachDistance);
 		}
 		foreach (Transform child in splashMountainPathContainer.transform)
+		{
+			Gizmos.DrawSphere (child.position, reachDistance);
+		}
+		foreach (Transform child in spaceMountainPathContainer1.transform)
+		{
+			Gizmos.DrawSphere (child.position, reachDistance);
+		}
+		foreach (Transform child in spaceMountainPathContainer2.transform)
 		{
 			Gizmos.DrawSphere (child.position, reachDistance);
 		}

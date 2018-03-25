@@ -14,6 +14,8 @@ namespace ParkHopper
 			ThunderMountain,
 			SplashMountain,
 			SpaceMountain,
+			SpaceMountain1,
+			SpaceMountain2,
 			Empty
 		}
 		static TileBehavior()
@@ -21,7 +23,9 @@ namespace ParkHopper
 			rideLookupDictionary = new Dictionary<Ride, string> ();
 			rideLookupDictionary.Add (Ride.ThunderMountain, "Big Thunder Mountain");
 			rideLookupDictionary.Add (Ride.SplashMountain, "Splash Mountain");
-			rideLookupDictionary.Add (Ride.SpaceMountain, "S[ace Mountain");
+			rideLookupDictionary.Add (Ride.SpaceMountain, "Space Mountain");
+			rideLookupDictionary.Add (Ride.SpaceMountain1, "Space Mountain");
+			rideLookupDictionary.Add (Ride.SpaceMountain2, "Space Mountain");
 		}
 		public enum TileType
 		{

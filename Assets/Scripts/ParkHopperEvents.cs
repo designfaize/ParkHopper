@@ -18,9 +18,13 @@ namespace ParkHopper.Events
 				typeof (DiceRollCompleteEvent),
 				typeof (PlayerLandedOnTileEvent),
 				typeof (TurnEndEvent),
+
+				// Ride Events
 				typeof (AskPayToRideEvent),
-				typeof (PayToRideEvent),
+				typeof (BeginRideEvent),
 				typeof (PayToRideSkipEvent),
+				typeof (UseFastpassEvent),
+				typeof (PayToRideEvent),
 
 				// SorcererCard Events
 				typeof (AskBuySorcererCardEvent),
@@ -62,6 +66,7 @@ namespace ParkHopper.Events
 			this.sorcererCards = sorcererCards;
 		}
 	}
+	public class PayToRideEvent : IEvent{}
 	public class DiceRollBeginEvent : IEvent{}
 	public class DieAtRestEvent : IEvent
 	{
@@ -93,6 +98,7 @@ namespace ParkHopper.Events
 			this.ride = ride;
 		}
 	}
+	public class UseFastpassEvent : IEvent {}
 	public class TurnEndEvent : IEvent
 	{
 		public int currentPlayer;
@@ -107,11 +113,15 @@ namespace ParkHopper.Events
 		public TileBehavior.Ride ride;
 		public string rideName;
 		public int cost;
-		public AskPayToRideEvent(TileBehavior.Ride ride, int cost)
+		public bool canUseFastPass;
+		public bool canUseCash;
+		public AskPayToRideEvent(TileBehavior.Ride ride, int cost, bool canUseFastPass, bool canUseCash)
 		{
 			this.ride = ride;
 			this.cost = cost;
 			this.rideName = TileBehavior.rideLookupDictionary [ride];
+			this.canUseFastPass = canUseFastPass;
+			this.canUseCash = canUseCash;
 		}
 	}
 	#region sorcerer card events
@@ -138,10 +148,10 @@ namespace ParkHopper.Events
 	public class AskUseSorcererCardEvent : IEvent {}
 	#endregion
 	// Handle the UI Interaction when deciding to pay to ride or skip
-	public class PayToRideEvent : IEvent
+	public class BeginRideEvent : IEvent
 	{
 		public TileBehavior.Ride ride;
-		public PayToRideEvent(TileBehavior.Ride ride)
+		public BeginRideEvent(TileBehavior.Ride ride)
 		{
 			this.ride = ride;
 		}

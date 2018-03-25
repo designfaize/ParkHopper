@@ -12,6 +12,8 @@ public class PayToRideView : MonoBehaviour {
 	private Button skipButton;
 	[SerializeField]
 	private GameObject payToRidePanel;
+	[SerializeField]
+	private Button fastPassButton;
 
 	private TileBehavior.Ride _ride;
 	void Start()
@@ -22,15 +24,21 @@ public class PayToRideView : MonoBehaviour {
 	{
 		rideButton.onClick.AddListener(onRideButtonClick);
 		skipButton.onClick.AddListener(onSkipButtonClick);
+		fastPassButton.onClick.AddListener(onFPButtonClick);
 	}
 	void Destroy()
 	{
 		rideButton.onClick.RemoveListener(onRideButtonClick);
 		skipButton.onClick.RemoveListener(onSkipButtonClick);
 	}
+	private void onFPButtonClick()
+	{
+		EventDispatcher.DispatchEvent (new UseFastpassEvent ());
+		Hide ();
+	}
 	private void onRideButtonClick()
 	{
-		EventDispatcher.DispatchEvent (new PayToRideEvent (_ride));
+		EventDispatcher.DispatchEvent (new PayToRideEvent ());
 		Hide ();
 	}
 	private void onSkipButtonClick()
@@ -42,6 +50,14 @@ public class PayToRideView : MonoBehaviour {
 	{
 		payToRidePanel.gameObject.SetActive (true);
 		_ride = ((AskPayToRideEvent)e).ride;
+		if (((AskPayToRideEvent)e).canUseFastPass)
+			fastPassButton.gameObject.SetActive (true);
+		else
+			fastPassButton.gameObject.SetActive (false);
+		if (((AskPayToRideEvent)e).canUseCash)
+			rideButton.gameObject.SetActive (true);
+		else
+			rideButton.gameObject.SetActive (false);
 	}
 	private void Hide()
 	{

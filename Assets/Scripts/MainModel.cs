@@ -38,8 +38,8 @@ namespace ParkHopper
 		private const float FORCE_MOVE_DELAY = 2f;
 		private PlayerLandedOnTileEvent _currentPayToRideEvent;
 		private PlayerLandedOnTileEvent _previousPlayerLandedOnTileEvent;
-		// Managers
-		 
+
+		private bool _rideDiceRoll = false;
 		// Use this for initialization
 		void Start () {
 			ParkHopperEvents.RegisterEvents ();
@@ -53,6 +53,7 @@ namespace ParkHopper
 			EventDispatcher.AddListener<SkipBuySorcererCardEvent> (onSkipBuySorcererCardEvent);
 			EventDispatcher.AddListener<UseSorcererCardEvent> (onUseSorcererCardEvent);
 			EventDispatcher.AddListener<SkipUseSorcererCardEvent> (onSkipUseSorcererCardEvent);
+			EventDispatcher.AddListener<UseFastpassEvent> (onUseFastpassEvent);
 
 
 			setupPlayers ();
@@ -82,14 +83,34 @@ namespace ParkHopper
 		// put them on the ride.
 		private void onPlayerPaidToRide(IEvent e)
 		{
-			currentPlayer.removeCash (_currentPayToRideEvent.value);
+			currentPlayer.removeCash (_previousPlayerLandedOnTileEvent.value);
+			SendRideEvent ();
+		}
+		private void onUseFastpassEvent (IEvent e)
+		{
+			currentPlayer.useFastPass ();
+			SendRideEvent ();
+		}
+		private void SendRideEvent()
+		{
+			// We have a strange ride behavior as designed by an 8 year old.
+			// Space mountain requires a dice roll.  Greater than a 3 you ride path 2
+			// Less than a 3, ride path 1.
+			if (_previousPlayerLandedOnTileEvent.ride == TileBehavior.Ride.SpaceMountain) 
+			{
+				_rideDiceRoll = true;
+				EventDispatcher.DispatchEvent(new ShowUIMessageEvent("Roll 3 or greater for Left Side. Less than 3 for Right."));
+				StartCoroutine(SendEventAfterDelay(new DiceRollBeginEvent (), ROLL_AGAIN_DELAY));
+				return;
+			}
+			EventDispatcher.DispatchEvent (new BeginRideEvent (_previousPlayerLandedOnTileEvent.ride));
 			_currentPayToRideEvent = null;
 		}
 		// If the user was presented the option to pay to ride and skipped, end the turn;
 		private void onPlayerPaidToRideSkip(IEvent e)
 		{
-			EndTurn ();
 			_currentPayToRideEvent = null;
+			EndTurn ();
 		}
 		private void onPlayerLandedOnTileEvent(IEvent e)
 		{
@@ -104,14 +125,20 @@ namespace ParkHopper
 					EndTurn ();
 					break;
 				case TileBehavior.TileType.Pay:
-					if (currentPlayer.getCashBalance () < evt.value) {
+				if (currentPlayer.getCashBalance () < evt.value && currentPlayer.getfastPassCount() == 0) {
 						EventDispatcher.DispatchEvent (new ShowUIMessageEvent ("Not enough Cash to ride " + TileBehavior.rideLookupDictionary [evt.ride]));
 						EndTurn ();
 					}
 					else 
 					{
 						_currentPayToRideEvent = evt;
-						EventDispatcher.DispatchEvent (new AskPayToRideEvent (evt.ride, evt.value));
+						bool canUseFastpass = false;
+						if (currentPlayer.getfastPassCount () > 0)
+							canUseFastpass = true;
+						bool canUseCash = false;
+						if (currentPlayer.getCashBalance () >= evt.value)
+							canUseCash = true;
+						EventDispatcher.DispatchEvent (new AskPayToRideEvent (evt.ride, evt.value, canUseFastpass, canUseCash));
 					}
 					break;
 				case TileBehavior.TileType.BuySorcererCard:
@@ -221,15 +248,36 @@ namespace ParkHopper
 		private void onDiceRollComplete(IEvent e)
 		{
 			DieAtRestEvent evt = (DieAtRestEvent)e;
-			_totalDiceValueThisRoll += evt.value;
-			_numberOfDiesAtRest++;
-			if (_numberOfDiesAtRest == numberOfDie) 
-			{
-				EventDispatcher.DispatchEvent (new DiceRollCompleteEvent (_totalDiceValueThisRoll, currentPlayer.playerNumber));
-				ResetDice ();
-				diceCamera.gameObject.SetActive(false);
-				playerCamera.gameObject.SetActive(true);
+			// Ride dice roll happens for space mountain.
+			// If this is a non special dice roll, do the normal stuff.
+			if (!_rideDiceRoll) {
+				_totalDiceValueThisRoll += evt.value;
+				_numberOfDiesAtRest++;
+				if (_numberOfDiesAtRest == numberOfDie) {
+					EventDispatcher.DispatchEvent (new DiceRollCompleteEvent (_totalDiceValueThisRoll, currentPlayer.playerNumber));
+					ResetDice ();
+					diceCamera.gameObject.SetActive (false);
+					playerCamera.gameObject.SetActive (true);
+				}
 			}
+			// If we are in our 1 off space mountain mode, do things a little different.
+			else 
+			{
+				HandleSpaceMountainMode (evt.value);
+			}
+		}
+		// Handle Space Mountain Mode
+		private void HandleSpaceMountainMode(int dice)
+		{
+			_rideDiceRoll = false;
+			ResetDice ();
+			diceCamera.gameObject.SetActive (false);
+			playerCamera.gameObject.SetActive (true);
+			if (dice >= 3)
+				EventDispatcher.DispatchEvent (new BeginRideEvent (TileBehavior.Ride.SpaceMountain2));
+			else 
+				EventDispatcher.DispatchEvent (new BeginRideEvent (TileBehavior.Ride.SpaceMountain1));
+			_currentPayToRideEvent = null;
 		}
 		private void ResetDice()
 		{

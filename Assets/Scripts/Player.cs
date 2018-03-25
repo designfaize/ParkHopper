@@ -33,6 +33,10 @@ public class Player : MonoBehaviour
 	{
 		return cash;
 	}
+	public int getfastPassCount()
+	{
+		return fastPasses;
+	}
 	public void addFastPass()
 	{
 		fastPasses++;
