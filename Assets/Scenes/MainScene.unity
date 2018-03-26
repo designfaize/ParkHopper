@@ -10034,7 +10034,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pathObjects: {fileID: 1496906258}
-  speed: 10
+  speed: 5
   reachDistance: 0.4
   players:
   - {fileID: 112460536}
@@ -10046,9 +10046,9 @@ MonoBehaviour:
   splashMountainPathContainer: {fileID: 141900978}
   splashExitTileIndex: 26
   testTrackPathContainer: {fileID: 318320169}
-  testTrackExitTileIndex: 55
+  testTrackExitTileIndex: 56
   figmentPathContainer: {fileID: 463550152}
-  figmentExitTileIndex: 57
+  figmentExitTileIndex: 58
   spaceMountainPathContainer1: {fileID: 95798251}
   spaceMountainPathContainer2: {fileID: 773668548}
   space1ExitTileIndex: 33
